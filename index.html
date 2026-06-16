@@ -75,7 +75,7 @@
             --btn-radius: 16px;
             --accent: #7c4dff;
             --accent-glow: rgba(124, 77, 255, 0.4);
-            --modal-bg: #1a1040;
+            --modal-bg: #fdf5e6;
             --modal-header: linear-gradient(135deg, #7c4dff, #00e5ff);
             --input-border: 1px solid rgba(124, 77, 255, 0.4);
             --input-focus: #7c4dff;
@@ -1066,8 +1066,8 @@
     </div>
 
     <div id="welcome-view">
-        <div class="welcome-title">偏旁大冒险<br>汉字富翁 🎲</div>
-        <div class="welcome-sub">专为小朋友设计的汉字学习大冒险游戏！</div>
+        <div class="welcome-title">偏旁大冒险<br>汉字大富翁 🎲</div>
+        <div class="welcome-sub">专为小朋友设计的汉字学习大富翁游戏！</div>
         <div style="margin-top: 10px;">
             <button class="menu-btn btn-neutral" onclick="showGameIntroduction()">📖 游戏规则介绍</button>
             <button class="menu-btn" onclick="quickStartGame()" style="background: linear-gradient(135deg, #ff7043, #ffb300);">🎲 开始经典游戏</button>
@@ -1075,8 +1075,8 @@
             <button class="menu-btn" onclick="showAuthorMessage()" style="background: linear-gradient(135deg, #9c27b0, #6a1b9a);">✍️ 作者想说的话</button>
         </div>
         <div class="footer-contact">
-            有任何想要讨论的内容或是想对作者说的话欢迎联系我：<br>
-            📬 <b>202311998019@bnu.edu.cn</b>
+            有任何想要与作者讨论的内容或是想说的话，欢迎联系：<br>
+            📬 <b>202311998019@mail.bnu.edu.cn</b>
         </div>
     </div>
 
@@ -1115,7 +1115,7 @@
 
                 <div class="setup-section" style="border:none;">
                     <h3>3. 考题题库管理</h3>
-                    <span class="sub-desc">自定增删拼音、识字、组词、易错字以及脑筋急转弯等内容。</span>
+                    <span class="sub-desc">自定增删拼音、识字、组词、易错字题库以及脑筋急转弯等内容。</span>
                     <button onclick="openQbDiyView()" class="btn-neutral" style="background:#4CAF50; font-weight:bold; width:100%; margin-top:5px;">📝 点击进入考题库自定义界面</button>
                 </div>
             </div>
@@ -1136,7 +1136,7 @@
     </div>
 
     <div id="diy-view" class="hidden">
-        <div class="page-title">🗺️ 自定义地图设计舱</div>
+        <div class="page-title">🗺️ 自定义地图设计区</div>
         <p style="font-size: 13px; color: var(--text-soft); text-align:center; margin-top:0; margin-bottom:20px;">大富翁总格子固定为 20格（1个起点 + 19个自定义功能格）。</p>
 
         <div class="diy-part">
@@ -1147,7 +1147,7 @@
 
         <div class="diy-part">
             <h4>第二部分：挑选"常规偏旁地皮"需要出现的偏旁</h4>
-            <span class="sub-desc">可以重复点击同一个偏旁进行多次注入。最右侧可自定义填入全新偏旁。</span>
+            <span class="sub-desc">可以重复点击同一个偏旁进行多次选择。最右侧可自定义填入全新偏旁。</span>
             <div class="radical-selector-box" id="radical-selector-pool"></div>
             <div style="margin-top:10px; display:flex; gap:10px; align-items:center; justify-content:space-between;">
                 <div>
@@ -1174,7 +1174,7 @@
     </div>
 
     <div id="qb-diy-view" class="hidden">
-        <div class="page-title">📝 考题库全功能自定义舱</div>
+        <div class="page-title">📝 考题库全功能自定义区</div>
 
         <div style="margin-bottom: 5px; text-align: center;">
             <label style="font-weight:bold; font-size:16px; color:var(--text);">当前切换修改的板块：
@@ -1209,7 +1209,7 @@
         </div>
 
         <div id="qb-export-textarea-box" class="hidden" style="margin-top:20px; background:var(--diy-part-bg); padding:12px; border-radius:12px; border: var(--diy-part-border);">
-            <h4 style="margin:0 0 5px 0; font-size:13px; color:var(--primary);">📋 汇总提取完成：(可直接全选 Ctrl+A 复制)</h4>
+            <h4 style="margin:0 0 5px 0; font-size:13px; color:var(--primary);">📋 汇总提取完成：(可直接全选 Ctrl+A 复制所有题目)</h4>
             <textarea id="qb-export-textarea" style="width:100%; height:100px; font-size:12px; box-sizing:border-box; color:var(--text); background:var(--card-bg); border:var(--input-border); border-radius:8px; padding:8px;" readonly></textarea>
         </div>
 
@@ -1278,25 +1278,108 @@
         };
 
         let QUESTION_BANK = {
-            "识字": ["请认读汉字【魑魅魍魉】并任挑一字组词。", "请说出成语【忐忑不安】的含义。", "【羸弱】的【羸】正确读音是什么？",
-                "请读出【飞奔】与【奔丧】中“奔”字的不同读音。"
+            "识字": [ 
+              "请认读【礼貌】两个字，并用其中一个字组一个词。",
+              "请认读【鲜艳】两个字，并用其中一个字造一个句子。",
+              "请认读【医院】两个字，并用其中一个字组词。",
+              "请认读【学校】两个字，并用其中一个字组词。",
+              "请认读【超市】两个字，并用其中一个字组词。",
+              "请认读【图书馆】三个字，并用其中一个字组词。",
+              "请认读【动物园】三个字，并用其中一个字组词。",
+              "请说出【森】字是由哪三个相同的字组成的。",
+              "请说出【众】字是由哪三个相同的字组成的。",
+              "请说出【品】字是由哪三个相同的字组成的。",
+              "请说出【晶】字是由哪三个相同的字组成的。",
+              "请说出【明】字是什么结构（左右结构/上下结构）。",
+              "请认读【大】和【太】这两个字，并说出它们的含义有什么区别。",
+              "请认读【天】和【夫】这两个字，并说出它们的含义有什么区别。",
+              "请认读【日】和【目】这两个字，并说出它们的含义有什么区别。",
+              "请认读成语【鸟语花香】，并说说它是什么意思。",
+              "请认读成语【山清水秀】，并说说它是什么意思。",
+              "请认读成语【风和日丽】，并说说它是什么意思。",
+              "请认读成语【柳绿花红】，并说说它是什么意思。",
+              "请认读成语【春回大地】，并说说它是什么意思。",
+              "请读出这句话：小兔子爱吃胡萝卜，蹦蹦跳跳真可爱。",
+              "请读出这句话：五星红旗迎风飘扬，我们爱祖国。",
             ],
-            "拼音": ["请准确拼读：xiān hóng (鲜红)", "请拼写出【苹果】的拼音并标出声调。", "找出词语中带后鼻音的字：天空、风筝"],
-            "组词": ["请用【天】字组成三个不同的词语。", "说出一个包含动物名称的四字成语。", "用【花】字组一个动词词语和一个名词词语。"],
-            "易错字": ["请区分【拨】与【拔】，并口头分别组词。", "【慷慨】的【慨】右半部常错写，请在纸上正确默写。",
-                "请在纸上工整写出【一张纸】，注意纸字底下没有点。", "请口头说明【辩论】的【辩】中间是什么部件？"
+            
+            "拼音": [
+              "请准确拼读：xiān hóng (鲜红)", 
+              "请准确拼读：xiāng jiāo (香蕉)",
+              "请准确拼读：píng guǒ (苹果)",
+              "请准确拼读：xī guā (西瓜)",
+              "请准确拼读：mǎ yǐ (蚂蚁)",
+              "请准确拼读：hú dié (蝴蝶)",
+              "请拼写出【苹果】的拼音并标出声调。", 
+              "请说出【吃饭】中【吃】的声母是什么。",
+              "请说出【跑步】中【跑】的韵母是什么。",
+              "请说出【快乐】中【快】的声母是什么。",
+              "请说出【花朵】中【花】的韵母是什么。",
+              "请读出【快乐】和【音乐】中【乐】字的不同读音。",
+              "请读出【长大】和【长短】中【长】字的不同读音。",
+              "请读出【种子】和【种地】中【种】字的不同读音。",
+              "请读出【好人】和【爱好】中【好】字的不同读音。",
+              "请读出【干净】和【干活】中【干】字的不同读音。",
             ],
+            
+            "组词": [
+              "请用【天】字组成三个不同的词语。",
+              "请说出一个包含动物名称的四字成语。",
+              "请说出一个带有数字的四字成语。",
+              "请说出一个带有颜色的四字成语。",
+              "请说出一个AABB式词语（如：高高兴兴）。",
+              "请用【乐】字组一个表示快乐的词，再组一个表示音乐的词。",
+              "用【花】字组一个动词词语和一个名词词语。",
+              "请说出两个四字成语",
+              "请说出两个带有草字头（艹）的汉字，并各组成一个词。",
+              "请说出两个带有三点水（氵）的汉字，并各组成一个词。",
+              "请说出两个带有木字旁（木）的汉字，并各组成一个词。",
+              "请说出两个带有提手旁（扌）的汉字，并各组成一个词。",
+              "请说出两个带有言字旁（讠）的汉字，并各组成一个词。",
+              "请用【工】和【公】分别组一个词。",
+              "请用【生】和【声】分别组一个词。",
+              "请用【明】和【名】分别组一个词。",
+              "请用【在】和【再】分别组一个词。",
+              "请用【已】和【己】分别组一个词。",
+              "请用【买】和【卖】分别组一个词。",
+              "请用【进】和【近】分别组一个词。",
+              "请用【体】和【休】分别组一个词。",
+              "请用【抱】和【跑】分别组一个词。",
+              "选字填空：画一条（ ）线，画一个（ ）心的笑脸。（直/真）",
+              "选字填空：我们一起（ ）耍，直到作业做（ ）成。（玩/完）",
+              "选字填空：他长得（ ）爸爸，也喜欢大（ ）。（像/象）",
+              "选字填空：我（ ）了车站，走在弯弯曲曲的小（ ）上。（到/道）",
+              "选字填空：你站在（ ）里？我站在（ ）边等你。（那/哪）",
+              "选字填空：一声（ ）下，天气变得很（ ）。（令/冷）",
+              "选字填空：小猫伸出（ ）子，正在吃西（ ）。（爪/瓜）"
+            ],
+            
+            "易错字": [
+                "请区分【拨】与【拔】，并口头分别组词。",
+                "请在纸上工整写出【一张纸】，注意纸字底下没有点。",
+                "请区分【拨】与【拔】，并分别组一个词。",
+                "请区分【辨】与【辩】，并分别组一个词。",
+                "请区分【燥】与【躁】，并分别组一个词。",
+                "请区分【代】与【伐】，并分别组一个词。",
+                "请区分【折】与【拆】，并分别组一个词。",
+                "请在纸上写出【真】字，注意里面是三横而不是两横。",
+                "请在纸上写出【直】字，注意里面是三横而不是两横。",
+                "请在纸上写出【具】字，注意里面是三横而不是两横。",
+            ],
+
             "脑筋急转弯": [
                 "什么字大家都会写错？ (错)",
                 "高个子和矮个子走路，谁的步子更大？ (不一定，看谁走得快)",
                 "什么门永远关不上？ (球门)",
                 "一加一在什么时候绝对不等于二？ (算错的时候)",
-                "汉字里，哪个字是最“热”的字？ (煋)",
                 "什么心不能用来思考，只能用来看？ (点心)",
                 "什么布剪断了之后连不断？ (瀑布)",
                 "什么东西越洗越脏？ (水)",
                 "为什么大雁秋天要飞到南方去？ (因为走过去太慢了)",
-                "哪个汉字有一百个眼睛？ (瞐)"
+                "哪个汉字有一百个眼睛？ (瞐)",
+                "什么字，五个口在一起是什么？（吾）",
+                "什么字，一个人一张口，口下长只手？（拿）",
+                "什么字，二小二小头上长草？（蒜）"
             ]
         };
 
@@ -1377,10 +1460,10 @@
 
         let diyCounts = { prop: 10, word: 2, read: 1, pinyin: 1, error: 1, tax: 1, chance: 1, fate: 1, rest: 1 };
 
-        let ALL_RADICALS_POOL = ["艹", "手", "扌", "水", "氵", "口", "木", "人", "亻", "言", "讠", "辶", "心", "金", "钅", "犭", "足",
+        let ALL_RADICALS_POOL = ["艹", "扌", "氵", "口", "木", "亻", "讠", "辶", "心", "钅", "犭", "足",
             "月", "火", "王", "土", "女", "纟", "日", "目", "门"
         ];
-        let SELECTED_RADICALS = ["艹", "扌", "氵", "口", "木", "亻", "讠", "辶", "心", "钅", "犭"];
+        let SELECTED_RADICALS = ["艹", "扌", "氵", "口", "木", "亻", "讠", "辶", "心", "钅"];
         let DIY_TILES_ORDER_LIST = [];
 
         /** ==================== 大屏缩放控制 ==================== **/
@@ -1410,10 +1493,54 @@
 
         /** ==================== 新增："作者想说的话"弹窗 ==================== **/
         function showAuthorMessage() {
-            let msgHtml = `
-                <div style="font-size: 18px; color: #5c2d91; font-weight: bold; text-align: center; margin: 20px 0;">
-                    srx123456
-                </div>
+          let msgHtml = `
+              <div style="font-size: 16px; color: #000000; font-family: 'Comic Sans MS'; text-align: left; margin: 20px 20px 10px 20px; line-height: 1.8;">
+                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                      我这个学期在北师大修读了一门课程《阅读障碍：从评估到干预》，事实上，这个小程序是我的一个课程大作业。
+                  </p>
+                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                      在这门课的实践环节，我和一位受到阅读障碍困扰的小朋友进行了五次干预，说是干预，其实是做些小游戏小手工、读读绘本。在每次干预开始前，我都会和我的搭档苦思冥想：今天可以带着小朋友做什么样的活动？
+                  </p>
+                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                      让我萌生这个“大富翁游戏”想法的也是在一次干预时，我们设计了一个飞行棋的活动，那位小朋友非常受用呀！已经到时间了仍然跟妈妈说还不愿意回家，说姐姐我们再玩一轮吧。
+                  </p>
+                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                      在此之后，我慢慢地开始理解老师在上课的时候和我们说的，我们需要设计出更多的干预类的游戏，把教学的形式变得不那么枯燥一些。
+                  </p>
+                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                      其实这个游戏，我设计的定位不只是面向受到Dyslexia困扰的孩子，我希望它能为正在学习汉字的孩子和他们背后“苦恼”的家长服务。
+                  </p>
+                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                      我希望孩子能发现：原来学习可以是这种形式；希望家长能发现：原来我可以通过这种方式教教我的小孩。
+                  </p>
+                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                      当然了！我知道我制作的这个小游戏肯定有很多不足之处，也会有其他人设计出更好的干预方式，但我也在想，我不能因为这些就不去做了！
+                  </p>
+                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                      我在“设置”的板块中加入了很多可以自由调节的环节，比如自由调节地块的数量，家长可以自行加入题目......在我的想象里，这个游戏在不同的家庭中可以被“玩”出不一样的效果，每个孩子的情况都不一样。
+                  </p>
+                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                      我建议家长们在游玩的过程中，找一张白纸，让孩子“写”字而不是简单地“读”字。也可以参考小学语文课本后的生词表来出题，可以让ai生成符合孩子当前学习状态的新题。因为我设置的题库数量很有限，肯定不能满足家长们的教学需求。
+                  </p>
+                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                      在最后，对有些许识字困难的孩子我想说：慢慢来，不要急。
+                  </p>
+                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                      对各位头疼的家长们我想说：感谢你们的耐心！常用汉字才3500个，即使孩子在低年级的时候学得慢一些、比别人学的少一些，但在反复的、长时间的练习下，总能把所有字都掌握的！有的时候，接纳孩子的不完美比接纳自己的不完美更困难。多给孩子一些鼓励，孩子能够感受到你们对ta的期待！
+                  </p>
+                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                      有需要的家长，可以关注我们老师的微信公众号：虹阅读实验室  
+                  </p>
+                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                      大家在体验游戏的过程中遇到什么困难，想要交流游戏的使用方法，或者是有什么想说的，都可以发送邮件到：202311998019@mail.bnu.edu.cn  
+                  </p>
+                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                      希望这个游戏不要再有bug了！
+                  </p>
+              </div>
+              <div style="text-align: center; font-size: 16px; color: #000000; font-family: 'Comic Sans MS'; margin: 10px 20px 20px 20px;">
+                  单小西  2026年6月6日
+              </div>
             `;
             showModal("✍️ 作者想说的话", msgHtml, [{ text: "退出", type: "wrong", action: hideModal }]);
         }
@@ -1425,7 +1552,7 @@
                 <hr style="border:none; border-top:1px solid #eee;">
                 <b>💡 核心玩法流程：</b><br>
                 1. 玩家轮流投掷骰子，在含有 20 个格子的环形地图上顺时针前进。<br>
-                2. 当走到<b>【常规偏旁地皮】</b>时，必须写出一个带有该偏旁的汉字。经家长判定正确后，可花费资金购买地皮或为已有地皮加盖房屋（最高2层）。如果回答错误或放弃，需要向银行或地主缴纳罚金/过路费。<br>
+                2. 当走到<b>【常规偏旁地皮】</b>时，必须在纸上写出一个带有该偏旁的汉字。经家长判定正确后，可花费资金购买地皮或为已有地皮加盖房屋（最高2层）。如果回答错误或放弃，需要向银行或地主缴纳罚金/过路费。<br>
                 3. <b>查重机制</b>：全场写过的字都会记录在【字词板】中，任何字不可重复使用，越往后越考验孩子！<br><br>
 
                 <b>🏢 特殊地块事件：</b><br>
@@ -1549,7 +1676,7 @@
         function rebuildDiyOrderListFromSliders() {
             let targetArr = [];
             let propIndexTracker = 0;
-            let poolToUse = SELECTED_RADICALS.length > 0 ? SELECTED_RADICALS : ["艹", "手", "扌", "水", "氵"];
+            let poolToUse = SELECTED_RADICALS.length > 0 ? SELECTED_RADICALS : ["艹", "手", "扌", "氵"];
 
             Object.keys(diyCounts).forEach(key => {
                 for (let i = 0; i < diyCounts[key]; i++) {
@@ -1737,7 +1864,7 @@
             if (DIY_TILES_ORDER_LIST.length === 0) rebuildDiyOrderListFromSliders();
 
             let finalMap = [{ id: 0, name: "起点", type: "start" }];
-            let poolToUse = SELECTED_RADICALS.length > 0 ? SELECTED_RADICALS : ["艹", "手", "扌", "水", "氵"];
+            let poolToUse = SELECTED_RADICALS.length > 0 ? SELECTED_RADICALS : ["艹", "手", "扌", "氵"];
             let propIndexCounter = 0;
 
             DIY_TILES_ORDER_LIST.forEach((item, index) => {
@@ -2218,7 +2345,7 @@
                         updateUI();
                         showEndPhase();
                     } },
-                { text: '没想上来 (免受任何罚款)', type: 'neutral', action: showEndPhase }
+                { text: '没想出来', type: 'neutral', action: showEndPhase }
             ]);
         }
 
