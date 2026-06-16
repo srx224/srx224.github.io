@@ -1,0 +1,1207 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>偏旁大冒险 · 汉字富翁 v4.7</title>
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --bg: #f4f7f6;
+            --text: #333;
+            --board-bg: #e8f5e9;
+            /* 玩家色彩配置 */
+            --p1: #ff5252;
+            --p2: #448aff;
+            --p3: #69f0ae;
+            --p4: #ffd740;
+            /* 特殊地块专属色彩配置 */
+            --bg-start: #ffe0b2;
+            --bg-learn-read: #e1bee7;
+            --bg-learn-pinyin: #d1c4e9;
+            --bg-learn-word: #c5cae9;
+            --bg-learn-error: #f8bbd0;
+            --bg-chance: #b3e5fc;
+            --bg-fate: #ffcdd2;
+            --bg-tax: #cfd8dc;
+            --bg-rest: #c8e6c9;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; box-sizing: border-box; }
+        h1, h2, h3 { margin-top: 0; margin-bottom: 5px; }
+        .sub-desc { font-size: 13px; color: #666; margin-bottom: 12px; display: block; line-height: 1.4; }
+        button { cursor: pointer; padding: 8px 16px; border: none; border-radius: 4px; background: var(--primary); color: white; font-size: 16px; transition: 0.2s; }
+        button:hover { opacity: 0.8; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        input, select, textarea { padding: 6px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; }
+        
+        .hidden { display: none !important; }
+        
+        /* 1. 欢迎界面样式 */
+        #welcome-view { max-width: 600px; margin: 50px auto; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); text-align: center; position: relative; }
+        .menu-btn { display: block; width: 80%; margin: 15px auto; padding: 15px; font-size: 20px; font-weight: bold; border-radius: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .footer-contact { margin-top: 30px; padding-top: 20px; border-top: 1px dashed #ddd; font-size: 13px; color: #666; line-height: 1.6; }
+
+        /* 2. 设置界面双栏样式 */
+        #setup-view { max-width: 1050px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .setup-section { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #eee; position: relative; }
+        .grid-2 { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 30px; }
+        .archive-box { background: #e3f2fd; padding: 10px; border-radius: 6px; margin-bottom: 15px; display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+        .btn-save { background: #2196F3; font-size: 14px; }
+        .btn-load { background: #9c27b0; font-size: 14px; }
+        
+        /* 地图预览框 */
+        #map-preview-container { background: #f9f9f9; border: 2px dashed #bbb; padding: 15px; border-radius: 8px; font-size: 13px; max-height: 480px; overflow-y: auto; }
+        .preview-tile-badge { display: inline-block; padding: 6px 10px; margin: 5px; background: #fff; border-radius: 4px; border-left: 5px solid #666; position: relative; cursor: help; border-top: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;}
+        
+        .preview-tile-badge .tooltip-text {
+            visibility: hidden; width: 240px; background-color: rgba(33, 33, 33, 0.96); color: #fff; text-align: left;
+            border-radius: 6px; padding: 10px; position: absolute; z-index: 9999; 
+            bottom: 130%; left: 50%; transform: translateX(-50%); 
+            opacity: 0; transition: opacity 0.2s ease; font-size: 12px; line-height: 1.5; 
+            pointer-events: none; box-shadow: 0 5px 15px rgba(0,0,0,0.4); border: 1px solid #555;
+        }
+        .preview-tile-badge .tooltip-text::after {
+            content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: rgba(33, 33, 33, 0.96) transparent transparent transparent;
+        }
+        .preview-tile-badge:hover .tooltip-text { visibility: visible; opacity: 1; transition-delay: 0.1s; }
+
+        /* 3. 新版DIY地图独立界面 */
+        #diy-view { max-width: 800px; margin: 10px auto; background: white; padding: 35px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+        .diy-part { background: #fcfcfc; border: 1px solid #eef2f0; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .diy-part h4 { margin: 0 0 10px 0; color: #333; border-left: 4px solid var(--primary); padding-left: 8px; }
+        .diy-slider-row { display: flex; align-items: center; margin-bottom: 12px; background: #fff; padding: 8px; border: 1px solid #eaeaea; border-radius: 6px; }
+        .diy-slider-row label { width: 180px; font-weight: bold; font-size: 14px; }
+        .diy-slider-row input[type="range"] { flex: 1; margin: 0 15px; }
+        .diy-slider-row .counter-val { width: 40px; text-align: center; font-weight: bold; color: var(--primary); }
+        
+        .radical-selector-box { display: flex; flex-wrap: wrap; gap: 6px; background: #fff; padding: 10px; border: 1px solid #eaeaea; border-radius: 6px; max-height: 110px; overflow-y: auto; }
+        .radical-pill { padding: 4px 10px; background: #f1f1f1; border-radius: 15px; font-size: 14px; cursor: pointer; user-select: none; border: 1px solid #ddd; transition: 0.1s; }
+        .radical-pill:hover { background: #e0e0e0; transform: scale(1.05); }
+        .radical-pill.selected { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; font-weight: bold; }
+        
+        .drag-sort-container { display: flex; flex-wrap: wrap; gap: 8px; background: #fff; padding: 12px; border: 1px solid #eaeaea; border-radius: 6px; min-height: 80px; }
+        .drag-badge { padding: 6px 12px; background: #e3f2fd; border: 1px solid #90caf9; color: #1565c0; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: move; user-select: none; transition: transform 0.1s; }
+        .drag-badge.dragging { opacity: 0.4; transform: scale(0.95); background: #ffe0b2; }
+
+        /* 4. 考题题库自定义独立界面 */
+        #qb-diy-view { max-width: 850px; margin: 10px auto; background: white; padding: 35px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+        .qb-box-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px; }
+        .qb-list { list-style: none; padding: 0; max-height: 220px; overflow-y: auto; background: #fafafa; border: 1px solid #ddd; border-radius: 4px; margin: 0 0 10px 0; }
+        .qb-list li { padding: 8px 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+        .btn-delete { background: #f44336; padding: 4px 8px; font-size: 12px; }
+
+        /* 5. 游戏主界面样式 */
+        #game-view { display: grid; grid-template-columns: 280px 1fr; gap: 25px; max-width: 1400px; margin: 0 auto; height: calc(100vh - 40px); align-items: start; }
+        .sidebar { display: flex; flex-direction: column; gap: 15px; max-height: calc(100vh - 40px); overflow-y: auto; padding-right: 5px; }
+        .panel { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e0e0e0; }
+        .player-info { margin-bottom: 10px; padding: 10px; border-left: 5px solid transparent; border-radius: 4px; background: #fafafa; }
+        .player-info.active { background: #fffde7; border-color: #ffd600; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+        .color-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 5px; }
+        #used-words-container { display: flex; flex-wrap: wrap; gap: 5px; max-height: 180px; overflow-y: auto; }
+        .used-word { padding: 4px 10px; border-radius: 12px; font-size: 14px; color: white; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+
+        /* 6. 棋盘大缩放容器 */
+        .board-outer-wrapper { display: flex; align-items: center; justify-content: center; background: white; border-radius: 16px; box-shadow: 0 6px 18px rgba(0,0,0,0.08); padding: 25px; border: 1px solid #e3e3e3; height: calc(100vh - 90px); overflow: auto; }
+        .board-container { width: 100%; max-width: 720px; aspect-ratio: 1; transition: transform 0.1s ease; transform-origin: center center; }
+        .board { display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(6, 1fr); gap: 6px; width: 100%; height: 100%; background: var(--board-bg); padding: 6px; border-radius: 12px; box-sizing: border-box; }
+        .tile { background: white; border: 2px solid #ccc; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-size: 14px; position: relative; padding: 5px; box-sizing: border-box; box-shadow: inset 0 0 4px rgba(0,0,0,0.05); }
+        .tile-name { font-weight: bold; font-size: 13px; margin-bottom: 2px; line-height: 1.2; word-break: break-all; }
+        .tile-price { font-size: 11px; color: #555; font-weight: bold; }
+        .tile-owner-bar { width: 100%; height: 6px; position: absolute; bottom: 0; left: 0; border-bottom-left-radius: 6px; border-bottom-right-radius: 6px; }
+        .tile-houses { position: absolute; top: 2px; right: 4px; font-size: 22px; line-height: 1; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+        
+        /* 环形坐标映射 */
+        .tile-0 { grid-column: 1; grid-row: 1; } .tile-1 { grid-column: 2; grid-row: 1; } .tile-2 { grid-column: 3; grid-row: 1; }
+        .tile-3 { grid-column: 4; grid-row: 1; } .tile-4 { grid-column: 5; grid-row: 1; } .tile-5 { grid-column: 6; grid-row: 1; } 
+        .tile-6 { grid-column: 6; grid-row: 2; } .tile-7 { grid-column: 6; grid-row: 3; } .tile-8 { grid-column: 6; grid-row: 4; } 
+        .tile-9 { grid-column: 6; grid-row: 5; } .tile-10 { grid-column: 6; grid-row: 6; } .tile-11 { grid-column: 5; grid-row: 6; } 
+        .tile-12 { grid-column: 4; grid-row: 6; } .tile-13 { grid-column: 3; grid-row: 6; } .tile-14 { grid-column: 2; grid-row: 6; } 
+        .tile-15 { grid-column: 1; grid-row: 6; } .tile-16 { grid-column: 1; grid-row: 5; } .tile-17 { grid-column: 1; grid-row: 4; } 
+        .tile-18 { grid-column: 1; grid-row: 3; } .tile-19 { grid-column: 1; grid-row: 2; }
+
+        .tokens { position: absolute; bottom: 8px; display: flex; gap: 3px; justify-content: center; width: 90%; }
+        .token { width: 15px; height: 15px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.4); transition: all 0.3s ease; }
+        .board-center { grid-column: 2 / 6; grid-row: 2 / 6; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: #fff; border-radius: 12px; border: 1px dashed #a5d6a7; padding: 10px; }
+        .dice-box { font-size: 52px; margin: 5px 0; height: 65px; font-weight: bold; }
+        #timer-display { font-size: 26px; font-weight: bold; color: #d32f2f; margin-bottom: 5px; }
+
+        /* 全局弹窗层 */
+        #modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+        .modal { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 520px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); position: relative; }
+        
+        /* 右上角 X 强制退出按钮样式 */
+        .modal-close-x { position: absolute; top: 12px; right: 15px; font-size: 22px; font-weight: bold; color: #999; cursor: pointer; user-select: none; line-height: 1; transition: 0.2s; }
+        .modal-close-x:hover { color: #f44336; transform: scale(1.1); }
+
+        .modal-title { font-size: 20px; font-weight: bold; margin-bottom: 15px; color: #2e7d32; padding-right: 20px; }
+        .modal-body { margin-bottom: 20px; font-size: 15px; line-height: 1.6; text-align: left; max-height: 350px; overflow-y: auto; padding-right: 5px; }
+        .modal-buttons { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .btn-correct { background: #4CAF50; } .btn-wrong { background: #f44336; }
+        .btn-neutral { background: #2196F3; } .btn-warning { background: #ff9800; }
+
+        .zoom-box { background: #efebe9; padding: 10px; border-radius: 8px; border: 1px solid #d7ccc8; font-size: 12px; font-weight: bold; color: #5d4037; }
+        .zoom-box input { width: 100%; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div id="welcome-view">
+        <h1 style="color:#2e7d32; font-size: 32px; margin-bottom: 10px;">偏旁大冒险 · 汉字富翁</h1>
+        <p style="color:#666; font-size: 15px;">一款专为儿童汉字学习打造的趣味趣味大富翁经营游戏</p>
+        <div style="margin-top: 30px;">
+            <button class="menu-btn btn-neutral" onclick="showGameIntroduction()">📖 游戏规则介绍</button>
+            <button class="menu-btn btn-correct" onclick="quickStartGame()" style="background:#ff9800;">🎲 开始经典游戏</button>
+            <button class="menu-btn btn-warning" onclick="openSetupView()" style="background:#4CAF50;">⚙️ 进入自由设置中心</button>
+            <button class="menu-btn" onclick="showAuthorMessage()" style="background:#9c27b0;">✍️ 作者想说的话</button>
+        </div>
+        <div class="footer-contact">
+            有任何想要讨论的内容或是想对作者说的话欢迎联系我：<br>
+            📬 <b>202311998019@bnu.edu.cn</b>
+        </div>
+    </div>
+
+    <div id="setup-view" class="hidden">
+        <h2 style="text-align:center; color:#2e7d32; margin-bottom: 20px;">⚙️ 自由配置中心</h2>
+        <div class="archive-box">
+            <span style="font-weight:bold; color:#1565c0;">📁 存档数据槽位：</span>
+            <div>
+                <button class="btn-save" onclick="saveArchive(1)">💾 存槽1</button>
+                <button class="btn-load" onclick="loadArchive(1)">📂 读槽1</button>
+                |
+                <button class="btn-save" onclick="saveArchive(2)">💾 存槽2</button>
+                <button class="btn-load" onclick="loadArchive(2)">📂 读槽2</button>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div>
+                <div class="setup-section">
+                    <h3>1. 基础经营设置</h3>
+                    <span class="sub-desc">调整玩家开局人数、胜利条件（如限时或破产）以及初始注入的资金数额。</span>
+                    <div style="margin-bottom:8px;"><label>玩家数量：<select id="setup-players"><option value="2">2 人</option><option value="3">3 人</option><option value="4">4 人</option></select></label></div>
+                    <div style="margin-bottom:8px;"><label>胜利条件：<select id="setup-win-condition" onchange="toggleTimeSetup()"><option value="bankrupt">破产决胜 (低于-1000元出局)</option><option value="time">限时对决 ⏳</option></select></label></div>
+                    <div id="time-setup-box" class="hidden" style="margin-bottom:8px; background:#fff8e1; padding:8px; border-radius:4px;">
+                        <label>对决时间：<select id="setup-time-duration" onchange="toggleCustomTime()"><option value="600">10 分钟</option><option value="900">15 分钟</option><option value="1800" selected>30 分钟</option><option value="custom">自定义时长</option></select></label>
+                        <span id="custom-time-input-box" class="hidden" style="margin-left:10px;"><input type="number" id="custom-time-min" value="20" style="width:60px;"> 分钟</span>
+                    </div>
+                    <div><label>初始资金：<select id="setup-money" onchange="toggleCustomMoney()"><option value="5000">5000 元</option><option value="10000">10000 元</option><option value="custom">自定义</option></select><input type="number" id="custom-money" class="hidden" value="8000" style="width: 80px; margin-left: 10px;"></label></div>
+                </div>
+                
+                <div class="setup-section">
+                    <h3>2. 高级地图编辑</h3>
+                    <span class="sub-desc">点击按钮进入自由设置细分地块数量及排列顺序。</span>
+                    <button onclick="openDiyView()" class="btn-neutral" style="background:#9c27b0; font-weight:bold; width:100%;">🗺️ 点击进入地图自由 DIY 界面</button>
+                </div>
+
+                <div class="setup-section" style="border:none;">
+                    <h3>3. 考题题库管理</h3>
+                    <span class="sub-desc">自定增删拼音、识字、组词、易错字以及脑筋急转弯等内容。</span>
+                    <button onclick="openQbDiyView()" class="btn-neutral" style="background:#4CAF50; font-weight:bold; width:100%; margin-top:5px;">📝 点击进入考题库自定义界面</button>
+                </div>
+            </div>
+            
+            <div>
+                <div class="setup-section" style="border:none; background:#f5f5f5; padding:15px; border-radius:10px;">
+                    <h3 style="color:#2e7d32; display:flex; align-items:center; gap:5px;">🗺️ 地图地块即时预览</h3>
+                    <span class="sub-desc" style="color:#e65100; font-weight:bold;">✨ 提示：把鼠标光标放在下方任何地块上并停留，可浮现该地块详细功能介绍。</span>
+                    <div id="map-preview-container"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align:center; margin-top: 20px; display: flex; justify-content: center; gap: 20px;">
+            <button onclick="returnToMenu()" class="btn-wrong" style="padding: 10px 40px; border-radius:30px;">返回大厅</button>
+            <button onclick="startGame()" style="font-size: 18px; padding: 10px 50px; background:#ff9800; border-radius: 30px; font-weight:bold;">保存并开始游戏！</button>
+        </div>
+    </div>
+
+    <div id="diy-view" class="hidden">
+        <h2 style="color:#9c27b0; text-align:center; margin-bottom:5px;">🗺️ 自定义地图设计舱</h2>
+        <p style="font-size: 13px; color: #666; text-align:center; margin-top:0;">大富翁总格子固定为 20格（1个起点 + 19个自定义功能格）。</p>
+        
+        <div class="diy-part">
+            <h4>第一部分：设置各地块的配比数量</h4>
+            <div style="margin: 8px 0; font-size:14px; font-weight:bold; color:#1565c0;" id="diy-total-status"></div>
+            <div id="diy-sliders-container"></div>
+        </div>
+
+        <div class="diy-part">
+            <h4>第二部分：挑选“常规偏旁地皮”需要出现的偏旁</h4>
+            <span class="sub-desc">可以重复点击同一个偏旁进行多次注入。最右侧可自定义填入全新偏旁。</span>
+            <div class="radical-selector-box" id="radical-selector-pool"></div>
+            <div style="margin-top:10px; display:flex; gap:10px; align-items:center; justify-content:space-between;">
+                <div>
+                    <button class="btn-neutral" onclick="addCustomRadical()" style="font-size:13px; padding:6px 12px; background:#673ab7;">➕ 自定义新偏旁</button>
+                    <button class="btn-wrong" onclick="clearSelectedRadicals()" style="font-size:13px; padding:6px 12px; margin-left:10px;">🗑️ 清空重选</button>
+                </div>
+                <span id="custom-radical-status" style="font-size:13px; color:#4CAF50; font-weight:bold;"></span>
+            </div>
+            <div style="margin-top:10px; font-size:13px; background:#f1f8e9; padding:8px; border-radius:4px; border:1px solid #c8e6c9; word-break:break-all;">
+                <b id="queue-count-label">当前挑选队列：</b> <span id="selected-radicals-preview" style="color:#2e7d32; font-weight:bold;"></span>
+            </div>
+        </div>
+
+        <div class="diy-part">
+            <h4>第三部分：自由设定地块的排列顺序</h4>
+            <span class="sub-desc">温馨提示：按住小标识可以随心所欲左右拖动调换地块的顺时针展现顺序。</span>
+            <div class="drag-sort-container" id="drag-sort-box"></div>
+        </div>
+
+        <div style="text-align:center; margin-top:25px; display: flex; justify-content: center; gap: 15px;">
+            <button class="btn-wrong" onclick="closeDiyView(false)">放弃修改</button>
+            <button id="btn-save-diy" class="btn-correct" onclick="closeDiyView(true)" style="padding:8px 30px;">保存该设置并返回</button>
+        </div>
+    </div>
+
+    <div id="qb-diy-view" class="hidden">
+        <h2 style="color:#2e7d32; text-align:center;">📝 考题库全功能自定义舱</h2>
+        
+        <div style="margin-bottom: 5px; text-align: center;">
+            <label style="font-weight:bold; font-size:16px;">当前切换修改的板块：
+                <select id="qb-diy-category" onchange="renderQbDiyView()"></select>
+            </label>
+        </div>
+
+        <div class="qb-box-layout">
+            <div>
+                <div style="background:#f9f9f9; padding:12px; border-radius:6px; margin-bottom:15px; border:1px solid #ddd;">
+                    <h4 style="margin:0 0 5px 0; font-size:14px; color:#1565c0;">方式一：单条逐个加入</h4>
+                    <span id="qb-format-tip" class="sub-desc" style="font-size:11px; color:#e65100; font-weight:bold;">
+                        ⚠️ 提示：若添加的是脑筋急转弯，请务必使用小括号将答案写在题目后面。例：什么字大家都会写错？(错)
+                    </span>
+                    <div style="display: flex; gap: 5px;">
+                        <input type="text" id="qb-diy-single-input" placeholder="请键入对应题目内容..." style="flex:1; font-size:14px;">
+                        <button onclick="addSingleQuestionDiy()" class="btn-correct" style="font-size:14px; padding:4px 12px;">添加</button>
+                    </div>
+                </div>
+                
+                <h4 style="margin:10px 0 5px 0; font-size:14px;">当前板块已存考题列表：</h4>
+                <ul id="qb-diy-list" class="qb-list"></ul>
+                <button class="btn-neutral" style="background:#ff9800; font-size:13px; width:100%; font-weight:bold;" onclick="exportAndShowAllQuestions()">📋 点击一键生成并查看全量考题文本（方便家长复制）</button>
+            </div>
+
+            <div style="background:#f1f8e9; padding:15px; border-radius:8px; border:1px solid #c8e6c9; display:flex; flex-direction:column;">
+                <h4 style="margin:0 0 5px 0; color:#2e7d32; font-size:14px;">方式二：多行批量输入注入</h4>
+                <span class="sub-desc" style="font-size:11px; color:#555;"><b>使用小提示：</b>一行就是一道独立考题。如果是脑筋急转弯，同样要求一行格式为：题目(答案)</span>
+                <textarea id="qb-diy-batch-input" style="flex:1; min-height:160px; font-size:13px; font-family:inherit;" placeholder="第一道题目写在这里&#13;第二道题目换行写在这里..."></textarea>
+                <button onclick="addBatchQuestionsDiy()" class="btn-correct" style="background:#2e7d32; font-weight:bold; margin-top:10px; width:100%;">⚡ 执行批量解析并注入题库</button>
+            </div>
+        </div>
+
+        <div id="qb-export-textarea-box" class="hidden" style="margin-top:20px; background:#fffde7; padding:12px; border-radius:6px; border:1px solid #fff59d;">
+            <h4 style="margin:0 0 5px 0; font-size:13px; color:#f57f17;">📋 汇总提取完成：(可直接全选 Ctrl+A 复制)</h4>
+            <textarea id="qb-export-textarea" style="width:100%; height:100px; font-size:12px; box-sizing:border-box;" readonly></textarea>
+        </div>
+
+        <div style="text-align:center; margin-top: 25px;">
+            <button onclick="closeQbDiyView()" class="btn-correct" style="padding: 10px 60px; border-radius:30px; font-weight:bold; background:#1565c0;">保存当前修改并返回配置中心</button>
+        </div>
+    </div>
+
+    <div id="game-view" class="hidden">
+        <div class="sidebar">
+            <div class="zoom-box">
+                <span>🎮 界面显示大小调节: <span id="zoom-val-display">1.0</span>x</span>
+                <input type="range" id="game-zoom-slider" min="0.6" max="1.4" step="0.05" value="1.0" oninput="onGameZoomAdjust()">
+            </div>
+            
+            <div class="panel"><h3>玩家信息</h3><div id="players-container"></div></div>
+            <div class="panel">
+                <h3>已用字记录板</h3>
+                <p style="font-size:12px; color:#666; margin-top:-10px;">(不同颜色代表不同玩家写出的字)</p>
+                <div id="used-words-container"></div>
+            </div>
+            <button class="btn-wrong" onclick="exitGameAction()" style="width:100%; padding:10px; font-weight:bold; border-radius:8px;">退出当前游戏</button>
+        </div>
+        
+        <div class="board-outer-wrapper">
+            <div class="board-container" id="resizable-board-container">
+                <div class="board" id="board">
+                    <div class="board-center">
+                        <div id="timer-display" class="hidden">30:00</div>
+                        <h2 id="turn-indicator" style="font-size: 18px;">加载中...</h2>
+                        <div class="dice-box" id="dice-display">🎲</div>
+                        <div>
+                            <button id="btn-roll" onclick="rollDice()">掷骰子</button>
+                            <button id="btn-move" class="hidden btn-neutral" onclick="movePlayerAction()">前进</button>
+                        </div>
+                        <div id="end-turn-actions" class="hidden" style="margin-top: 10px; border-top:1px dashed #ccc; padding-top:10px;"><button onclick="endTurn()">结束回合</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-overlay" class="hidden">
+        <div class="modal">
+            <span class="modal-close-x" onclick="forceDismissModal()">×</span>
+            <div class="modal-title" id="modal-title"></div>
+            <div class="modal-body" id="modal-body"></div>
+            <div class="modal-buttons" id="modal-buttons"></div>
+        </div>
+    </div>
+
+<script>
+/** ==================== 核心数据结构 ==================== **/
+const PLAYER_COLORS = ['var(--p1)', 'var(--p2)', 'var(--p3)', 'var(--p4)'];
+
+const DIY_KEY_MAP = {
+    prop: "常规偏旁地皮",
+    word: "组词挑战格",
+    read: "识字挑战格",
+    pinyin: "拼音挑战格",
+    error: "易错字挑战格",
+    tax: "地税局(脑筋急转弯)",
+    chance: "机会区域",
+    fate: "命运区域",
+    rest: "安全休息区"
+};
+
+let QUESTION_BANK = {
+    "识字": ["请认读汉字【魑魅魍魉】并任挑一字组词。", "请说出成语【忐忑不安】的含义。", "【羸弱】的【羸】正确读音是什么？", "请读出【飞奔】与【奔丧】中“奔”字的不同读音。"],
+    "拼音": ["请准确拼读：xiān hóng (鲜红)", "请拼写出【苹果】的拼音并标出声调。", "找出词语中带后鼻音的字：天空、风筝"],
+    "组词": ["请用【天】字组成三个不同的词语。", "说出一个包含动物名称的四字成语。", "用【花】字组一个动词词语和一个名词词语。"],
+    "易错字": ["请区分【拨】与【拔】，并口头分别组词。", "【慷慨】的【慨】右半部常错写，请在纸上正确默写。", "请在纸上工整写出【一张纸】，注意纸字底下没有点。", "请口头说明【辩论】的【辩】中间是什么部件？"],
+    "脑筋急转弯": [
+        "什么字大家都会写错？ (错)",
+        "高个子和矮个子走路，谁的步子更大？ (不一定，看谁走得快)",
+        "什么门永远关不上？ (球门)",
+        "一加一在什么时候绝对不等于二？ (算错的时候)",
+        "汉字里，哪个字是最“热”的字？ (煋)",
+        "什么心不能用来思考，只能用来看？ (点心)",
+        "什么布剪断了之后连不断？ (瀑布)",
+        "什么东西越洗越脏？ (水)",
+        "为什么大雁秋天要飞到南方去？ (因为走过去太慢了)",
+        "哪个汉字有一百个眼睛？ (瞐)"
+    ]
+};
+
+const CHANCE_CARDS = [
+    { text: "<b>【机会卡：偏旁大师】</b>认真复习形声字偏旁规律，获得银行发给的 300 元奖学金！", action: (p) => { p.money += 300; showEndPhase(); } },
+    { text: "<b>【机会卡：汉字演变】</b>发现金文到楷书的变换规律，激发魔力！【随机向前传送 1~3 步】", action: (p) => { let s = Math.floor(Math.random() * 3) + 1; alert(`触发前进！向前推进了 ${s} 步`); resolveMoveStep(s); } },
+    { text: "<b>【机会卡：才华横溢】</b>在诗词大会上表现出色，获得资助 400 元现金！", action: (p) => { p.money += 400; showEndPhase(); } },
+    { text: "<b>【机会卡：字典助攻】</b>捡到一本精美新字典，过路费免疫（本轮直接结束免缴税）。", action: (p) => { showEndPhase(); } },
+    { text: "<b>【机会卡：结伴同行】</b>邀请小伙伴一起研究会意字，银行特批过路补贴金 200 元。", action: (p) => { p.money += 200; showEndPhase(); } },
+    { text: "<b>【机会卡：突飞猛进】</b>汉字听写大赛荣获一等奖！群情激荡，【直接前移 2 步】。", action: (p) => { resolveMoveStep(2); } },
+    { text: "<b>【机会卡：天降福星】</b>路过学校文具店，抽中汉字盲盒，意外获得 150 元现金！", action: (p) => { p.money += 150; showEndPhase(); } },
+    { text: "<b>【机会卡：熟能生巧】</b>多练字使你身轻如燕，随机【向前传送 1 步】。", action: (p) => { resolveMoveStep(1); } }
+];
+
+const FATE_CARDS = [
+    { text: "<b>【命运卡：马虎大意】</b>粗心写了错别字，被老师指正，交纳 300 元改错罚金供给银行。", action: (p) => { p.money -= 300; checkBankrupt(p); showEndPhase(); } },
+    { text: "<b>【命运卡：南辕北辙】</b>字形混淆看错了地图导航！【随机向后倒退 1~3 步】", action: (p) => { let s = -(Math.floor(Math.random() * 3) + 1); alert(`触发后退！向后倒退了 ${Math.abs(s)} 步`); resolveMoveStep(s); } },
+    { text: "<b>【命运卡：字典翻阅】</b>遇到生僻字查字典太久，下回合强制在原地停跑、休息一轮。", action: (p) => { p.skipNext = true; showEndPhase(); } },
+    { text: "<b>【命运卡：作业未完】</b>因忙于补齐汉字描红本，被托管班扣留，交纳罚款 200 元。", action: (p) => { p.money -= 200; checkBankrupt(p); showEndPhase(); } },
+    { text: "<b>【命运卡：墨水泼洒】</b>不小心打翻了墨水瓶弄脏衣服，去更衣室清洗，【向后倒退 2 步】。", action: (p) => { resolveMoveStep(-2); } },
+    { text: "<b>【命运卡：意外逆流】</b>汉字笔顺写颠倒，遭遇思维混乱反噬，【向后倒退 1 步】。", action: (p) => { resolveMoveStep(-1); } },
+    { text: "<b>【命运卡：买错文具】</b>错买无证劣质橡皮擦，被没收并扣除破损费 100 元。", action: (p) => { p.money -= 100; checkBankrupt(p); showEndPhase(); } },
+    { text: "<b>【命运卡：沉迷连环画】</b>在路上看连环画入了迷走错道，强制在下回合【休整停跑一圈】。", action: (p) => { p.skipNext = true; showEndPhase(); } }
+];
+
+const TILES_EXPLAIN_DICT = {
+    "start": "起点格：每次路过或驻足，均可以额外领到500元奖学金。",
+    "prop": "常规偏旁地皮：踩中后需要写一个该部首的汉字，正确后可出资买下或加盖房产。",
+    "word": "组词挑战格：抽取指定字或要求说出含有特写条件的成语，答对可获得200元奖金！",
+    "read": "识字挑战格：触发有趣的汉字或生僻字辨析认读，答对即可赢得200元奖励！",
+    "pinyin": "拼音挑战格：触发韵母、声调、拼读等专项汉语拼音考核，答对即可赢得200元奖励！",
+    "error": "易错字挑战格：专门攻克平时极易混淆或写错的笔画细节，考核成功可拿走200元。",
+    "chance": "机会区域：可能获得红包奖励，也可能随机触发前进1~3步！",
+    "fate": "命运区域：可能面临银行罚金，也可能被拉回倒退1~3步或停跑！",
+    "tax": "地税局(脑筋急转弯)：答对高额奖赏300元，即便没答上来也不会扣除玩家任何资金。",
+    "rest": "安全休息区：停留在此时可以无惩罚安全度过，但下回合需要在此停跑休整一圈。"
+};
+
+let usedWords = []; 
+let players = [];
+let currentPlayerIndex = 0;
+let mapData = [];
+let winCondition = 'bankrupt';
+let timeLeft = 1800; 
+let timerInterval = null;
+let currentDiceValue = 0;
+
+let diyCounts = { prop: 10, word: 2, read: 1, pinyin: 1, error: 1, tax: 1, chance: 1, fate: 1, rest: 1 };
+
+let ALL_RADICALS_POOL = ["艹", "手", "扌", "水", "氵", "口", "木", "人", "亻", "言", "讠", "辶", "心", "金", "钅", "犭", "足", "月", "火", "王", "土", "女", "纟", "日", "目", "门"];
+let SELECTED_RADICALS = ["艹", "扌", "氵", "口", "木", "亻", "讠", "辶", "心", "钅", "犭"]; 
+let DIY_TILES_ORDER_LIST = []; 
+
+/** ==================== 大屏缩放控制 ==================== **/
+function onGameZoomAdjust() {
+    let zoomVal = document.getElementById('game-zoom-slider').value;
+    document.getElementById('zoom-val-display').innerText = zoomVal;
+    let container = document.getElementById('resizable-board-container');
+    if (container) { container.style.transform = `scale(${zoomVal})`; }
+}
+
+/** ==================== 视图切换控制 ==================== **/
+function openSetupView() {
+    document.getElementById('welcome-view').classList.add('hidden');
+    document.getElementById('setup-view').classList.remove('hidden');
+    initSetupConfigs();
+}
+function returnToMenu() {
+    document.getElementById('setup-view').classList.add('hidden');
+    document.getElementById('welcome-view').classList.remove('hidden');
+}
+function quickStartGame() {
+    document.getElementById('welcome-view').classList.add('hidden');
+    startGameDirectly();
+}
+
+/** ==================== 新增：“作者想说的话”弹窗 ==================== **/
+function showAuthorMessage() {
+    let msgHtml = `
+        <div style="font-size: 18px; color: #5c2d91; font-weight: bold; text-align: center; margin: 20px 0;">
+            srx123456
+        </div>
+    `;
+    showModal("✍️ 作者想说的话", msgHtml, [{ text: "退出", type: "wrong", action: hideModal }]);
+}
+
+/** ==================== 游戏规则介绍 ==================== **/
+function showGameIntroduction() {
+    let rulesHtml = `
+        <p>欢迎来到<b>《偏旁大冒险 · 汉字富翁》</b>！这是一款将大富翁强策略模拟经营与儿童小学阶段汉字核心知识完美融合的亲子互动益智游戏。</p>
+        <hr style="border:none; border-top:1px solid #eee;">
+        <b>💡 核心玩法流程：</b><br>
+        1. 玩家轮流投掷骰子，在含有 20 个格子的环形地图上顺时针前进。<br>
+        2. 当走到<b>【常规偏旁地皮】</b>时，必须写出一个带有该偏旁的汉字。经家长判定正确后，可花费资金购买地皮或为已有地皮加盖房屋（最高2层）。如果回答错误或放弃，需要向银行或地主缴纳罚金/过路费。<br>
+        3. <b>查重机制</b>：全场写过的字都会记录在【字词板】中，任何字不可重复使用，越往后越考验孩子！<br><br>
+        
+        <b>🏢 特殊地块事件：</b><br>
+        • <b>【组词/识字/拼音/易错字挑战】</b>：触发对应的专项汉语考核，答对即可赢得200元激励奖金！<br>
+        • <b>【地税局 (脑筋急转弯)】</b>：脑力博弈区。<b>答对可获得300元现金奖励，答错不扣除任何资金！</b>彻底激发思考热情。<br>
+        • <b>【机会/命运】</b>：包含随机1-3步的突发前进或后退。<br>
+        • <b>【休息区】</b>：安全避风港，下回合会原地停跑一轮。<br><br>
+        <b>🏆 胜利及保护机制：</b><br>
+        • 玩家资产低于 -1000 元时面临最终破产出局。
+    `;
+    showModal("📖 游戏全功能规则手册", rulesHtml, [{ text: "我已知晓，返回主页", type: "correct", action: hideModal }]);
+}
+
+/** ==================== 全新细化分拆 DIY 地图引擎 ==================== **/
+function openDiyView() {
+    document.getElementById('setup-view').classList.add('hidden');
+    document.getElementById('diy-view').classList.remove('hidden');
+    
+    rebuildDiyOrderListFromSliders();
+    renderDiySliders();
+    renderRadicalSelector();
+    renderDragSortContainer();
+}
+
+function renderDiySliders() {
+    const container = document.getElementById('diy-sliders-container');
+    container.innerHTML = '';
+    
+    Object.keys(diyCounts).forEach(key => {
+        let div = document.createElement('div');
+        div.className = 'diy-slider-row';
+        div.innerHTML = `
+            <label>${DIY_KEY_MAP[key]}</label>
+            <input type="range" id="slider-${key}" min="0" max="19" value="${diyCounts[key]}" oninput="onDiySliderMove('${key}')">
+            <span class="counter-val" id="counter-${key}">${diyCounts[key]}</span>
+        `;
+        container.appendChild(div);
+    });
+    checkSlidersTotalAndStatus();
+}
+
+function onDiySliderMove(changedKey) {
+    let targetVal = parseInt(document.getElementById(`slider-${changedKey}`).value);
+    document.getElementById(`counter-${changedKey}`).innerText = targetVal;
+    diyCounts[changedKey] = targetVal;
+    
+    checkSlidersTotalAndStatus();
+    rebuildDiyOrderListFromSliders();
+    renderDragSortContainer();
+}
+
+function checkSlidersTotalAndStatus() {
+    let currentSum = 0;
+    Object.keys(diyCounts).forEach(key => { currentSum += diyCounts[key]; });
+
+    let statusBox = document.getElementById('diy-total-status');
+    let saveBtn = document.getElementById('btn-save-diy');
+    
+    if (currentSum === 19) {
+        statusBox.innerHTML = `<span style="color:#4CAF50;">✅ 配置总数恰好为 19 格 (外加1个固定起点 = 20格)，配比正确！</span>`;
+        saveBtn.disabled = false;
+    } else {
+        statusBox.innerHTML = `<span style="color:#f44336;">❌ 地块未配平！当前已设：${currentSum} 格 (要求必须等于 19 格，当前差距：${19 - currentSum} 格)。</span>`;
+        saveBtn.disabled = true;
+    }
+}
+
+function renderRadicalSelector() {
+    const poolBox = document.getElementById('radical-selector-pool');
+    poolBox.innerHTML = '';
+    
+    ALL_RADICALS_POOL.forEach(rad => {
+        let span = document.createElement('span');
+        span.className = 'radical-pill';
+        span.innerText = rad;
+        span.onclick = () => {
+            SELECTED_RADICALS.push(rad);
+            refreshRadicalSelectedPreview();
+            rebuildDiyOrderListFromSliders();
+            renderDragSortContainer();
+        };
+        poolBox.appendChild(span);
+    });
+    refreshRadicalSelectedPreview();
+}
+
+function clearSelectedRadicals() {
+    SELECTED_RADICALS = [];
+    refreshRadicalSelectedPreview();
+    rebuildDiyOrderListFromSliders();
+    renderDragSortContainer();
+}
+
+function refreshRadicalSelectedPreview() {
+    const labelBox = document.getElementById('queue-count-label');
+    const previewSpan = document.getElementById('selected-radicals-preview');
+    labelBox.innerHTML = `当前挑选队列 <span style="color:#1565c0; font-size:15px;">(${SELECTED_RADICALS.length}个)</span>：`;
+    
+    if(SELECTED_RADICALS.length === 0) {
+        previewSpan.innerHTML = `<span style="color:#999; font-weight:normal;">暂未选择，将默认自动循环取主偏旁池</span>`;
+    } else {
+        previewSpan.innerText = SELECTED_RADICALS.join(' 、 ');
+    }
+}
+
+function addCustomRadical() {
+    let res = prompt("请输入您想要在地图游戏里加入的自定义偏旁（限1字）：");
+    if (res && res.trim()) {
+        let clean = res.trim().substring(0, 1);
+        if (!ALL_RADICALS_POOL.includes(clean)) { ALL_RADICALS_POOL.push(clean); }
+        SELECTED_RADICALS.push(clean);
+        renderRadicalSelector();
+        document.getElementById('custom-radical-status').innerText = `已添加【${clean}】！`;
+        setTimeout(() => { document.getElementById('custom-radical-status').innerText=''; }, 3000);
+    }
+}
+
+function rebuildDiyOrderListFromSliders() {
+    let targetArr = [];
+    let propIndexTracker = 0;
+    let poolToUse = SELECTED_RADICALS.length > 0 ? SELECTED_RADICALS : ["艹", "手", "扌", "水", "氵"];
+
+    Object.keys(diyCounts).forEach(key => {
+        for(let i=0; i < diyCounts[key]; i++) {
+            let label = "";
+            if(key === 'prop') {
+                let currentRadical = poolToUse[propIndexTracker % poolToUse.length];
+                label = `[${currentRadical}] 偏旁地皮`;
+                propIndexTracker++;
+            } else {
+                label = DIY_KEY_MAP[key].split('(')[0];
+            }
+            targetArr.push({ type: key, label: label });
+        }
+    });
+    DIY_TILES_ORDER_LIST = targetArr;
+}
+
+function renderDragSortContainer() {
+    const container = document.getElementById('drag-sort-box');
+    container.innerHTML = '';
+    if (DIY_TILES_ORDER_LIST.length === 0) return;
+
+    DIY_TILES_ORDER_LIST.forEach((item, index) => {
+        let div = document.createElement('div');
+        div.className = 'drag-badge';
+        div.draggable = true;
+        div.innerText = `${index + 1}.${item.label}`;
+        div.dataset.index = index;
+        
+        div.addEventListener('dragstart', handleDragStart);
+        div.addEventListener('dragover', handleDragOver);
+        div.addEventListener('drop', handleDrop);
+        div.addEventListener('dragend', handleDragEnd);
+        
+        container.appendChild(div);
+    });
+}
+
+let dragSrcIndex = null;
+function handleDragStart(e) { dragSrcIndex = this.dataset.index; this.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move';}
+function handleDragOver(e) { if (e.preventDefault) e.preventDefault(); return false; }
+function handleDrop(e) {
+    e.stopPropagation();
+    let targetIndex = this.dataset.index;
+    if (dragSrcIndex !== null && dragSrcIndex !== targetIndex) {
+        const movedItem = DIY_TILES_ORDER_LIST.splice(dragSrcIndex, 1)[0];
+        DIY_TILES_ORDER_LIST.splice(targetIndex, 0, movedItem);
+        renderDragSortContainer();
+    }
+    return false;
+}
+function handleDragEnd() { this.classList.remove('dragging'); dragSrcIndex = null; }
+
+function closeDiyView(shouldSave) {
+    if (!shouldSave) syncDiyCountsFromActualMap();
+    document.getElementById('diy-view').classList.add('hidden');
+    document.getElementById('setup-view').classList.remove('hidden');
+    updateMapPreview();
+}
+
+function syncDiyCountsFromActualMap() {
+    if(mapData && mapData.length > 1) {
+        let counts = { prop: 0, word: 0, read: 0, pinyin: 0, error: 0, tax: 0, chance: 0, fate: 0, rest: 0 };
+        mapData.forEach(t => { if(t.type !== 'start' && counts[t.type] !== undefined) counts[t.type]++; });
+        diyCounts = counts;
+    }
+}
+
+/** ==================== 考题题库自定义模块 ==================== **/
+function openQbDiyView() {
+    document.getElementById('setup-view').classList.add('hidden');
+    document.getElementById('qb-diy-view').classList.remove('hidden');
+    
+    const sel = document.getElementById('qb-diy-category');
+    sel.innerHTML = '';
+    Object.keys(QUESTION_BANK).forEach(cat => {
+        sel.innerHTML += `<option value="${cat}">${cat}板块</option>`;
+    });
+    
+    renderQbDiyView();
+    document.getElementById('qb-export-textarea-box').classList.add('hidden');
+}
+
+function renderQbDiyView() {
+    let cat = document.getElementById('qb-diy-category').value;
+    let list = document.getElementById('qb-diy-list');
+    list.innerHTML = QUESTION_BANK[cat].length === 0 ? `<li style="color:#999; justify-content:center;">暂无题目，请手动添加</li>` : '';
+    
+    QUESTION_BANK[cat].forEach((q, idx) => {
+        let li = document.createElement('li');
+        li.innerHTML = `
+            <span style="text-overflow:ellipsis; overflow:hidden; white-space:nowrap; flex:1; padding-right:10px;">${q}</span>
+            <button class="btn-delete" onclick="deleteQuestionDiy('${cat}', ${idx})">删除</button>
+        `;
+        list.appendChild(li);
+    });
+}
+
+function addSingleQuestionDiy() {
+    let cat = document.getElementById('qb-diy-category').value;
+    let input = document.getElementById('qb-diy-single-input');
+    let val = input.value.trim();
+    if (val) {
+        QUESTION_BANK[cat].push(val);
+        input.value = '';
+        renderQbDiyView();
+    } else { alert("请输入有效的考题内容！"); }
+}
+
+function addBatchQuestionsDiy() {
+    let cat = document.getElementById('qb-diy-category').value;
+    let area = document.getElementById('qb-diy-batch-input');
+    let text = area.value.trim();
+    if (!text) { alert("批量输入框内容为空！"); return; }
+    
+    let lines = text.split('\n');
+    let addedCount = 0;
+    lines.forEach(line => {
+        let cleanLine = line.trim();
+        if (cleanLine) { QUESTION_BANK[cat].push(cleanLine); addedCount++; }
+    });
+    area.value = '';
+    renderQbDiyView();
+    alert(`🎉 批量注入成功！已将 ${addedCount} 道题目加入【${cat}】中。`);
+}
+
+function deleteQuestionDiy(cat, idx) {
+    QUESTION_BANK[cat].splice(idx, 1);
+    renderQbDiyView();
+}
+
+function exportAndShowAllQuestions() {
+    let cat = document.getElementById('qb-diy-category').value;
+    let box = document.getElementById('qb-export-textarea-box');
+    let area = document.getElementById('qb-export-textarea');
+    area.value = QUESTION_BANK[cat].length === 0 ? "当前板块考题库为空。" : QUESTION_BANK[cat].join('\n');
+    box.classList.remove('hidden');
+    area.select();
+}
+
+function closeQbDiyView() {
+    document.getElementById('qb-diy-view').classList.add('hidden');
+    document.getElementById('setup-view').classList.remove('hidden');
+}
+
+/** ==================== 地图结构装配 ==================== **/
+function updateMapPreview() {
+    const previewContainer = document.getElementById('map-preview-container');
+    previewContainer.innerHTML = '';
+    
+    let simulatedMap = generateFinalMapStructure();
+    simulatedMap.forEach(tile => {
+        let c = "#fff";
+        if(tile.type === 'start') c = "var(--bg-start)";
+        else if(tile.type === 'word') c = "var(--bg-learn-word)";
+        else if(tile.type === 'read') c = "var(--bg-learn-read)";
+        else if(tile.type === 'pinyin') c = "var(--bg-learn-pinyin)";
+        else if(tile.type === 'error') c = "var(--bg-learn-error)";
+        else if(tile.type === 'chance') c = "var(--bg-chance)";
+        else if(tile.type === 'fate') c = "var(--bg-fate)";
+        else if(tile.type === 'tax') c = "var(--bg-tax)";
+        else if(tile.type === 'rest') c = "var(--bg-rest)";
+        
+        let explain = TILES_EXPLAIN_DICT[tile.type] || "地块功能介绍加载中...";
+        
+        previewContainer.innerHTML += `
+            <span class="preview-tile-badge" style="background:${c}; border-left-color:#666;">
+                ${tile.id}.${tile.name}
+                <span class="tooltip-text"><b>${tile.name}</b><br>${explain}</span>
+            </span>`;
+    });
+}
+
+function generateFinalMapStructure() {
+    if (DIY_TILES_ORDER_LIST.length === 0) rebuildDiyOrderListFromSliders();
+    
+    let finalMap = [{ id: 0, name: "起点", type: "start" }];
+    let poolToUse = SELECTED_RADICALS.length > 0 ? SELECTED_RADICALS : ["艹", "手", "扌", "水", "氵"];
+    let propIndexCounter = 0;
+
+    DIY_TILES_ORDER_LIST.forEach((item, index) => {
+        let id = index + 1;
+        if (item.type === 'prop') {
+            let rad = poolToUse[propIndexCounter % poolToUse.length];
+            finalMap.push({ id: id, name: `[${rad}] 地皮`, type: 'prop', radical: rad, price: 2000 + (id * 50), owner: null, houses: 0 });
+            propIndexCounter++;
+        } else if (item.type === 'word') {
+            finalMap.push({ id: id, name: "组词挑战", type: "word" });
+        } else if (item.type === 'read') {
+            finalMap.push({ id: id, name: "识字挑战", type: "read" });
+        } else if (item.type === 'pinyin') {
+            finalMap.push({ id: id, name: "拼音挑战", type: "pinyin" });
+        } else if (item.type === 'error') {
+            finalMap.push({ id: id, name: "易错字挑战", type: "error" });
+        } else if (item.type === 'chance') {
+            finalMap.push({ id: id, name: "机会区域", type: "chance" });
+        } else if (item.type === 'fate') {
+            finalMap.push({ id: id, name: "命运区域", type: "fate" });
+        } else if (item.type === 'tax') {
+            finalMap.push({ id: id, name: "地税局", type: "tax" });
+        } else if (item.type === 'rest') {
+            finalMap.push({ id: id, name: "休息区", type: "rest" });
+        }
+    });
+    return finalMap;
+}
+
+function initSetupConfigs() { updateMapPreview(); }
+function toggleCustomMoney() { document.getElementById('custom-money').className = document.getElementById('setup-money').value === 'custom' ? '' : 'hidden'; }
+function toggleTimeSetup() { document.getElementById('time-setup-box').className = document.getElementById('setup-win-condition').value === 'time' ? '' : 'hidden'; }
+function toggleCustomTime() { document.getElementById('custom-time-input-box').className = document.getElementById('setup-time-duration').value === 'custom' ? '' : 'hidden'; }
+
+function saveArchive(slot) {
+    let configData = { qb: QUESTION_BANK, diyCounts: diyCounts, selRadicals: SELECTED_RADICALS, orderList: DIY_TILES_ORDER_LIST };
+    localStorage.setItem(`chinese_monopoly_v46_slot_${slot}`, JSON.stringify(configData));
+    alert(`🎉 成功保存设置到槽位 ${slot}！`);
+}
+function loadArchive(slot) {
+    let rawStr = localStorage.getItem(`chinese_monopoly_v46_slot_${slot}`);
+    if(!rawStr) { alert(`❌ 槽位 ${slot} 为空！`); return; }
+    let data = JSON.parse(rawStr);
+    QUESTION_BANK = data.qb;
+    diyCounts = data.diyCounts;
+    if(data.selRadicals) SELECTED_RADICALS = data.selRadicals;
+    if(data.orderList) DIY_TILES_ORDER_LIST = data.orderList;
+    updateMapPreview();
+    alert(`📂 已加载槽位 ${slot} 的配置！`);
+}
+
+function exitGameAction() { if(confirm("确定要放弃当前的战局吗？")) { if(timerInterval) clearInterval(timerInterval); location.reload(); } }
+
+/** ==================== 游戏主控逻辑 ==================== **/
+function startGameDirectly() {
+    players = [
+        { id: 0, name: `玩家 1`, color: PLAYER_COLORS[0], money: 5000, position: 0, bankrupt: false, skipNext: false },
+        { id: 1, name: `玩家 2`, color: PLAYER_COLORS[1], money: 5000, position: 0, bankrupt: false, skipNext: false }
+    ];
+    winCondition = 'bankrupt';
+    mapData = generateFinalMapStructure();
+    executeEnterGameView();
+}
+
+function startGame() {
+    const pCount = parseInt(document.getElementById('setup-players').value);
+    winCondition = document.getElementById('setup-win-condition').value;
+    const moneyMode = document.getElementById('setup-money').value;
+    const initialMoney = moneyMode === 'custom' ? parseInt(document.getElementById('custom-money').value) : parseInt(moneyMode);
+
+    if(winCondition === 'time') {
+        const durationMode = document.getElementById('setup-time-duration').value;
+        timeLeft = durationMode === 'custom' ? parseInt(document.getElementById('custom-time-min').value) * 60 : parseInt(durationMode);
+    }
+
+    players = [];
+    for(let i=0; i<pCount; i++) {
+        players.push({ id: i, name: `玩家 ${i+1}`, color: PLAYER_COLORS[i], money: initialMoney, position: 0, bankrupt: false, skipNext: false });
+    }
+
+    mapData = generateFinalMapStructure();
+    document.getElementById('setup-view').classList.add('hidden');
+    executeEnterGameView();
+}
+
+function executeEnterGameView() {
+    document.getElementById('game-view').classList.remove('hidden');
+    if(winCondition === 'time') {
+        document.getElementById('timer-display').classList.remove('hidden');
+        startTimer();
+    }
+    renderBoard();
+    updateUI();
+    currentPlayerIndex = 0;
+    onGameZoomAdjust();
+    startTurn();
+}
+
+function renderBoard() {
+    const board = document.getElementById('board');
+    const center = board.querySelector('.board-center');
+    board.innerHTML = ''; board.appendChild(center);
+
+    mapData.forEach(tile => {
+        const div = document.createElement('div');
+        div.className = `tile tile-${tile.id}`;
+        div.id = `tile-${tile.id}`;
+        
+        if(tile.type === 'start') div.style.background = "var(--bg-start)";
+        else if(tile.type === 'word') div.style.background = "var(--bg-learn-word)";
+        else if(tile.type === 'read') div.style.background = "var(--bg-learn-read)";
+        else if(tile.type === 'pinyin') div.style.background = "var(--bg-learn-pinyin)";
+        else if(tile.type === 'error') div.style.background = "var(--bg-learn-error)";
+        else if(tile.type === 'chance') div.style.background = "var(--bg-chance)";
+        else if(tile.type === 'fate') div.style.background = "var(--bg-fate)";
+        else if(tile.type === 'tax') div.style.background = "var(--bg-tax)";
+        else if(tile.type === 'rest') div.style.background = "var(--bg-rest)";
+        else div.style.background = "#ffffff";
+        
+        let content = `<div class="tile-name">${tile.name}</div>`;
+        if(tile.price) content += `<div class="tile-price">¥${tile.price}</div>`;
+        if(tile.type === 'prop') {
+            content += `<div class="tile-owner-bar" id="owner-bar-${tile.id}"></div>`;
+            content += `<div class="tile-houses" id="houses-${tile.id}"></div>`;
+        }
+        content += `<div class="tokens" id="tokens-${tile.id}"></div>`;
+        div.innerHTML = content;
+        board.appendChild(div);
+    });
+    updateTokens();
+}
+
+function updateUI() {
+    const pContainer = document.getElementById('players-container');
+    pContainer.innerHTML = '';
+    players.forEach((p, idx) => {
+        if(p.bankrupt) return;
+        let props = mapData.filter(t => t.owner === p.id).length;
+        let freezeText = p.money < 0 ? `<span style="color:red; font-weight:bold;"> (冻结)</span>` : '';
+        pContainer.innerHTML += `
+            <div class="player-info ${idx === currentPlayerIndex ? 'active' : ''}">
+                <div style="font-weight:bold;"><span class="color-dot" style="background:${p.color}"></span>${p.name}</div>
+                <div style="color: ${p.money<0?'#d32f2f':'#333'}">现金: ¥${p.money}${freezeText}</div>
+                <div style="font-size:12px; color:#666;">置产数: ${props} 块</div>
+            </div>
+        `;
+    });
+    
+    mapData.forEach(t => {
+        if(t.type === 'prop' && t.owner !== null) {
+            const owner = players.find(p => p.id === t.owner);
+            document.getElementById(`owner-bar-${t.id}`).style.background = owner.color;
+            document.getElementById(`houses-${t.id}`).innerHTML = '🏠'.repeat(t.houses);
+        } else if (t.type === 'prop') {
+            document.getElementById(`owner-bar-${t.id}`).style.background = 'transparent';
+            document.getElementById(`houses-${t.id}`).innerHTML = '';
+        }
+    });
+    document.getElementById('used-words-container').innerHTML = usedWords.map(w => `<span class="used-word" style="background:${w.color};">${w.text}</span>`).join('');
+}
+
+function updateTokens() {
+    mapData.forEach(t => document.getElementById(`tokens-${t.id}`).innerHTML = '');
+    players.forEach(p => {
+        if(!p.bankrupt) {
+            const token = document.createElement('div');
+            token.className = 'token'; token.style.background = p.color;
+            document.getElementById(`tokens-${p.position}`).appendChild(token);
+        }
+    });
+}
+
+function startTimer() {
+    if(timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        let m = Math.floor(timeLeft / 60); let s = timeLeft % 60;
+        document.getElementById('timer-display').innerText = `${m}:${s < 10 ? '0'+s : s}`;
+        if(timeLeft <= 0) { clearInterval(timerInterval); endGame(); }
+    }, 1000);
+}
+
+function startTurn() {
+    const cp = players[currentPlayerIndex];
+    if(cp.bankrupt) { nextTurn(); return; }
+    
+    updateUI();
+    document.getElementById('turn-indicator').innerText = `轮到 ${cp.name}`;
+    document.getElementById('turn-indicator').style.color = cp.color;
+    
+    document.getElementById('btn-roll').classList.remove('hidden');
+    document.getElementById('btn-move').classList.add('hidden');
+    document.getElementById('end-turn-actions').classList.add('hidden');
+    document.getElementById('dice-display').innerText = '🎲';
+
+    if(cp.skipNext) {
+        cp.skipNext = false;
+        showModal('休息区调整', `${cp.name} 本轮在休息室修整，停止行动。`, [{ text: '好的', type: 'neutral', action: () => { hideModal(); nextTurn(); } }]);
+        document.getElementById('btn-roll').classList.add('hidden');
+    }
+}
+
+function rollDice() {
+    document.getElementById('btn-roll').classList.add('hidden');
+    let rolls = 0;
+    let anim = setInterval(() => {
+        document.getElementById('dice-display').innerText = Math.floor(Math.random() * 6) + 1;
+        rolls++;
+        if(rolls > 10) {
+            clearInterval(anim);
+            currentDiceValue = Math.floor(Math.random() * 6) + 1;
+            document.getElementById('dice-display').innerText = currentDiceValue;
+            document.getElementById('btn-move').classList.remove('hidden');
+        }
+    }, 50);
+}
+
+function movePlayerAction() {
+    document.getElementById('btn-move').classList.add('hidden');
+    resolveMoveStep(currentDiceValue);
+}
+
+function resolveMoveStep(steps) {
+    const cp = players[currentPlayerIndex];
+    let stepsTaken = 0;
+    let direction = steps > 0 ? 1 : -1;
+    let absSteps = Math.abs(steps);
+
+    let moveAnim = setInterval(() => {
+        cp.position = (cp.position + direction + 20) % 20;
+        updateTokens();
+        if(cp.position === 0 && direction > 0) { cp.money += 500; updateUI(); }
+        stepsTaken++;
+        if(stepsTaken >= absSteps) { clearInterval(moveAnim); handleTileEvent(cp.position); }
+    }, 300);
+}
+
+function handleTileEvent(pos) {
+    const tile = mapData[pos];
+    const cp = players[currentPlayerIndex];
+
+    switch(tile.type) {
+        case 'start': showEndPhase(); break;
+        case 'prop': handlePropertyEvent(tile, cp); break;
+        case 'word': handleLearnEvent("组词"); break;
+        case 'read': handleLearnEvent("识字"); break;
+        case 'pinyin': handleLearnEvent("拼音"); break;
+        case 'error': handleLearnEvent("易错字"); break;
+        case 'chance': drawCard(CHANCE_CARDS, "✨ 抽取机会区域卡"); break;
+        case 'fate': drawCard(FATE_CARDS, "⚡ 抽取命运区域卡"); break;
+        case 'tax': handleTaxEvent(); break;
+        case 'rest':
+            cp.skipNext = true;
+            showModal("停靠休息区", "安全区域，下回合原地休整一圈。", [{ text: '闭目养神', action: showEndPhase, type: 'neutral' }]);
+            break;
+    }
+}
+
+function handlePropertyEvent(tile, cp) {
+    let ownerName = tile.owner === null ? "无主荒地" : players.find(p => p.id === tile.owner).name;
+    let html = `此地盘属于【${ownerName}】。<br><br>
+                <b>请写出以 [ ${tile.radical} ] 为偏旁的单字：</b><br>
+                <input type="text" id="radical-input" maxlength="1" style="font-size:24px; text-align:center; width:60px; margin-top:15px; padding:5px;">`;
+    
+    showModal(`偏旁关卡战：${tile.radical}`, html, [
+        { text: '核对检查', type: 'correct', action: () => submitRadical(tile, cp) },
+        { text: '未想出来', type: 'warning', action: () => processPropertyResult(tile, cp, false, null) }
+    ]);
+    setTimeout(() => { document.getElementById('radical-input')?.focus(); }, 100);
+}
+
+function submitRadical(tile, cp) {
+    let val = document.getElementById('radical-input').value.trim();
+    if (!val || val.length !== 1) { alert("请输入一个汉字！"); return; }
+    if (usedWords.some(w => w.text === val)) {
+        alert(`【${val}】已被写过了！不可重复使用。`);
+        processPropertyResult(tile, cp, false, val);
+    } else {
+        showModal("家长裁决审阅面板", `孩子写出的汉字是：<span style="font-size:32px; color:#e91e63; font-weight:bold;">${val}</span><br><br>请家长把关，它是否属于【${tile.radical}】部首？`, [
+            { text: '正确无误', type: 'correct', action: () => { usedWords.push({ text: val, color: cp.color }); processPropertyResult(tile, cp, true, val); }},
+            { text: '错误不合格', type: 'wrong', action: () => processPropertyResult(tile, cp, false, val) }
+        ]);
+    }
+}
+
+function processPropertyResult(tile, cp, isSuccess, word) {
+    updateUI(); 
+    let penalty = Math.floor(tile.price * 0.10); 
+    let rent = Math.floor(tile.price * 0.05);    
+    let housesFee = tile.houses * 200;               
+
+    if (tile.owner === null) {
+        if (isSuccess) {
+            if(cp.money < 0) {
+                showModal("挑战正确", `字形正确！已载入板中。<br><br><span style="color:#d32f2f; font-weight:bold;">⚠️ 鉴于你当前的现金为负数(¥${cp.money})，面临财务红灯，本轮无法实施地皮购入！</span>`, [{ text: '了解', type: 'neutral', action: showEndPhase }]);
+            } else {
+                showModal("挑战正确", `字形正确！已载入板中。<br><br>是否花费 ¥${tile.price} 置办这块偏旁地产？`, [
+                    { text: '确认出资购买', type: 'correct', action: () => { 
+                        if(cp.money < tile.price) {
+                            showModal("失败拦截", `<span style="color:red; font-weight:bold; font-size:18px;">资金不足，无法进行购买！</span>`, [{ text: '知道了', type: 'neutral', action: showEndPhase }]);
+                        } else { cp.money -= tile.price; tile.owner = cp.id; updateUI(); showEndPhase(); }
+                    }},
+                    { text: '放弃置业', type: 'neutral', action: showEndPhase }
+                ]);
+            }
+        } else {
+            cp.money -= penalty; updateUI(); checkBankrupt(cp);
+            showModal("判定不通过", `未答对。<br>强制支付10%地皮开发税金给银行：<b>-¥${penalty}</b>`, [{ text: '继续', type: 'wrong', action: showEndPhase }]);
+        }
+    } else if (tile.owner !== cp.id) {
+        let owner = players.find(p => p.id === tile.owner);
+        if (isSuccess) {
+            let total = rent + housesFee; cp.money -= total; owner.money += total; updateUI(); checkBankrupt(cp);
+            showModal("防御成功", `触发半价特权！<br>支付过路打折费 + 附加费：<b>¥${total}</b> 给 ${owner.name}`, [{ text: '结账', type: 'correct', action: showEndPhase }]);
+        } else {
+            let total = penalty + housesFee; cp.money -= total; owner.money += total; updateUI(); checkBankrupt(cp);
+            showModal("防御失败", `全额严惩！<br>需交纳过路费 + 房屋费：<b>¥${total}</b> 给 ${owner.name}`, [{ text: '买单', type: 'wrong', action: showEndPhase }]);
+        }
+    } else {
+        if (isSuccess) {
+            if(cp.money < 0) {
+                showModal("巡视领土", `欢迎回归。当前你处于负债期，拒绝允许加盖楼宇！`, [{ text: '继续', type: 'neutral', action: showEndPhase }]);
+            } else if (tile.houses < 2) {
+                let cost = Math.floor(tile.price * 0.25);
+                showModal("巡视领土", `这是你的家园。<br>是否花费 <b>¥${cost}</b> 为此增设一栋附属房屋？`, [
+                    { text: '确认盖楼', type: 'correct', action: () => { 
+                        if(cp.money < cost) {
+                            showModal("建造失败", `<span style="color:red; font-weight:bold; font-size:18px;">资金不足，无法进行购买！</span>`, [{ text: '知道了', type: 'neutral', action: showEndPhase }]);
+                        } else { cp.money -= cost; tile.houses++; updateUI(); showEndPhase(); }
+                    }},
+                    { text: '保持现状', type: 'neutral', action: showEndPhase }
+                ]);
+            } else { showModal("巡视领土", `此处建筑规模已封顶。`, [{ text: '前行', type: 'neutral', action: showEndPhase }]); }
+        } else { showModal("测验失败", `回答错，暂停本轮房产投资扩建。`, [{ text: '结束', type: 'wrong', action: showEndPhase }]); }
+    }
+}
+
+function handleLearnEvent(categoryKey) {
+    showModal(`${categoryKey}挑战格`, `踩中特殊格子，请选择考核题目抽取来源：`, [
+        { text: '随机抽取系统预设题', type: 'correct', action: () => {
+            let list = QUESTION_BANK[categoryKey];
+            let q = list.length > 0 ? list[Math.floor(Math.random() * list.length)] : "研发库暂空，请家长口头拟一题。";
+            triggerFinalLearnQuestion(categoryKey, `【系统抽题】<br><br><b style="font-size:17px; color:#1565c0;">${q}</b><br><br>孩子答完后由长辈给出最终意见：`);
+        }},
+        { text: '家长亲临现场拟题', type: 'neutral', action: () => {
+            triggerFinalLearnQuestion(categoryKey, `【随堂出题】<br><br>请家长结合 <b>${categoryKey}</b> 板块出题考察孩子。<br>回答后裁决：`);
+        }}
+    ]);
+}
+
+function triggerFinalLearnQuestion(titleLabel, htmlContent) {
+    showModal(`${titleLabel}挑战格`, htmlContent, [
+        { text: '完全正确 (+200元奖励)', type: 'correct', action: () => {
+            let textInput = prompt("（可选）输入孩子答对的关联字，以便录入板中（留空跳过）：");
+            if(textInput && textInput.trim()) usedWords.push({ text: textInput.trim(), color: players[currentPlayerIndex].color });
+            players[currentPlayerIndex].money += 200; updateUI(); showEndPhase();
+        }},
+        { text: '不通过 (无奖励)', type: 'wrong', action: showEndPhase }
+    ]);
+}
+
+function handleTaxEvent() {
+    let list = QUESTION_BANK["脑筋急转弯"];
+    let qStr = list.length > 0 ? list[Math.floor(Math.random() * list.length)] : "什么门永远关不上？ (球门)";
+    
+    let questionText = qStr.split('(')[0].split('（')[0]; 
+    let answerText = "无解";
+    if (qStr.includes('(')) answerText = qStr.split('(')[1].replace(')', '');
+    else if (qStr.includes('（')) answerText = qStr.split('（')[1].replace('）', '');
+
+    let html = `请听题：<br><br><b style="font-size:16px; color:#c2185b;">${questionText}</b><br><br>
+                <div id="bt-answer-field" class="hidden" style="background:#e8f5e9; padding:10px; border-radius:6px; margin-bottom:10px; color:#2e7d32; font-weight:bold; border: 1px solid #a5d6a7;">
+                    💡 隐藏的正确答案：${answerText}
+                </div>
+                <button id="btn-show-bt-ans" onclick="document.getElementById('bt-answer-field').classList.remove('hidden'); this.style.display='none';" class="btn-neutral" style="font-size:13px; padding:4px 10px; background:#ff9800;">🔍 点击查看正确答案</button>`;
+
+    showModal("🏛️ 地税局智力脑筋急转弯竞答", html, [
+        { text: '孩子回答灵敏正确 (+300元)', type: 'correct', action: () => {
+            players[currentPlayerIndex].money += 300; updateUI(); showEndPhase();
+        }},
+        { text: '没想上来 (免受任何罚款)', type: 'neutral', action: showEndPhase }
+    ]);
+}
+
+function drawCard(deck, title) {
+    const card = deck[Math.floor(Math.random() * deck.length)];
+    showModal(title, card.text, [
+        { text: '收下并执行', type: 'neutral', action: () => { card.action(players[currentPlayerIndex]); updateUI(); } }
+    ]);
+}
+
+function checkBankrupt(p) {
+    if(p.money <= -1000 && !p.bankrupt) {
+        p.bankrupt = true;
+        mapData.forEach(t => { if(t.owner === p.id) { t.owner = null; t.houses = 0; } });
+        updateUI();
+        showModal("🚨 破产通告", `${p.name} 财务杠杆彻底断裂出局！`, [{ text: '离开围栏', type: 'wrong', action: hideModal }]);
+    }
+}
+
+function showEndPhase() { hideModal(); if(players[currentPlayerIndex].bankrupt) { nextTurn(); return; } document.getElementById('end-turn-actions').classList.remove('hidden'); }
+function endTurn() { document.getElementById('end-turn-actions').classList.add('hidden'); nextTurn(); }
+function nextTurn() { checkBankrupt(players[currentPlayerIndex]); let active = players.filter(p => !p.bankrupt); if(active.length <= 1) { endGame(); return; } currentPlayerIndex = (currentPlayerIndex + 1) % players.length; startTurn(); }
+
+function forceDismissModal() {
+    hideModal();
+    if(document.getElementById('btn-roll').classList.contains('hidden') && document.getElementById('btn-move').classList.contains('hidden')) {
+        document.getElementById('end-turn-actions').classList.remove('hidden');
+    }
+}
+
+function endGame() {
+    if(timerInterval) clearInterval(timerInterval);
+    players.forEach(p => {
+        p.totalAsset = p.money;
+        if(!p.bankrupt) {
+            mapData.forEach(t => { if(t.owner === p.id) { p.totalAsset += t.price; p.totalAsset += (Math.floor(t.price * 0.25) * t.houses); } });
+        } else { p.totalAsset = -99999; }
+    });
+    players.sort((a,b) => b.totalAsset - a.totalAsset);
+    let html = `<h2>🎉 游戏凯旋，结算报告！ 🎉</h2><h3>桂冠得主：${players[0].name}</h3><br>`;
+    players.forEach((p, i) => { html += `<p>第 ${i+1} 名: ${p.name} - ${p.bankrupt ? '不幸破产' : '最终总资产 ¥'+p.totalAsset}</p>`; });
+    showModal("争霸赛终点喜报", html, [{ text: '复盘重开', type: 'correct', action: () => location.reload() }]);
+}
+
+function showModal(title, bodyHtml, buttons) {
+    document.getElementById('modal-title').innerHTML = title; document.getElementById('modal-body').innerHTML = bodyHtml;
+    const container = document.getElementById('modal-buttons'); container.innerHTML = '';
+    buttons.forEach(b => {
+        const btn = document.createElement('button'); btn.innerHTML = b.text; btn.className = `btn-${b.type}`; btn.onclick = b.action; container.appendChild(btn);
+    });
+    document.getElementById('modal-overlay').classList.remove('hidden');
+}
+function hideModal() { document.getElementById('modal-overlay').classList.add('hidden'); }
+</script>
+</body>
+</html>
