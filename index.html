@@ -64,7 +64,7 @@
             --bg: #0d0d1a;
             --bg-grad: linear-gradient(135deg, #0d0d1a 0%, #1a0d2e 50%, #0d1a2e 100%);
             --text: #f0ecff;
-            --text-soft: #b8add4;
+            --text-soft: #f0ecff;
             --card-bg: rgba(28, 20, 52, 0.95);
             --card-shadow: 0 8px 32px rgba(124, 77, 255, 0.2);
             --card-border: 1px solid rgba(124, 77, 255, 0.3);
@@ -75,7 +75,7 @@
             --btn-radius: 16px;
             --accent: #7c4dff;
             --accent-glow: rgba(124, 77, 255, 0.4);
-            --modal-bg: #fdf5e6;
+            --modal-bg: #3d2b1f;
             --modal-header: linear-gradient(135deg, #7c4dff, #00e5ff);
             --input-border: 1px solid rgba(124, 77, 255, 0.4);
             --input-focus: #7c4dff;
@@ -1492,59 +1492,65 @@
         }
 
         /** ==================== 新增："作者想说的话"弹窗 ==================== **/
-        function showAuthorMessage() {
-          let msgHtml = `
-              <div style="font-size: 16px; color: #000000; font-family: 'Comic Sans MS'; text-align: left; margin: 20px 20px 10px 20px; line-height: 1.8;">
-                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
-                      我这个学期在北师大修读了一门课程《阅读障碍：从评估到干预》，事实上，这个小程序是我的一个课程大作业。
-                  </p>
-                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
-                      在这门课的实践环节，我和一位受到阅读障碍困扰的小朋友进行了五次干预，说是干预，其实是做些小游戏小手工、读读绘本。在每次干预开始前，我都会和我的搭档苦思冥想：今天可以带着小朋友做什么样的活动？
-                  </p>
-                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
-                      让我萌生这个“大富翁游戏”想法的也是在一次干预时，我们设计了一个飞行棋的活动，那位小朋友非常受用呀！已经到时间了仍然跟妈妈说还不愿意回家，说姐姐我们再玩一轮吧。
-                  </p>
-                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
-                      在此之后，我慢慢地开始理解老师在上课的时候和我们说的，我们需要设计出更多的干预类的游戏，把教学的形式变得不那么枯燥一些。
-                  </p>
-                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
-                      其实这个游戏，我设计的定位不只是面向受到Dyslexia困扰的孩子，我希望它能为正在学习汉字的孩子和他们背后“苦恼”的家长服务。
-                  </p>
-                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
-                      我希望孩子能发现：原来学习可以是这种形式；希望家长能发现：原来我可以通过这种方式教教我的小孩。
-                  </p>
-                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
-                      当然了！我知道我制作的这个小游戏肯定有很多不足之处，也会有其他人设计出更好的干预方式，但我也在想，我不能因为这些就不去做了！
-                  </p>
-                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
-                      我在“设置”的板块中加入了很多可以自由调节的环节，比如自由调节地块的数量，家长可以自行加入题目......在我的想象里，这个游戏在不同的家庭中可以被“玩”出不一样的效果，每个孩子的情况都不一样。
-                  </p>
-                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
-                      我建议家长们在游玩的过程中，找一张白纸，让孩子“写”字而不是简单地“读”字。也可以参考小学语文课本后的生词表来出题，可以让ai生成符合孩子当前学习状态的新题。因为我设置的题库数量很有限，肯定不能满足家长们的教学需求。
-                  </p>
-                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
-                      在最后，对有些许识字困难的孩子我想说：慢慢来，不要急。
-                  </p>
-                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
-                      对各位头疼的家长们我想说：感谢你们的耐心！常用汉字才3500个，即使孩子在低年级的时候学得慢一些、比别人学的少一些，但在反复的、长时间的练习下，总能把所有字都掌握的！有的时候，接纳孩子的不完美比接纳自己的不完美更困难。多给孩子一些鼓励，孩子能够感受到你们对ta的期待！
-                  </p>
-                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
-                      有需要的家长，可以关注我们老师的微信公众号：虹阅读实验室  
-                  </p>
-                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
-                      大家在体验游戏的过程中遇到什么困难，想要交流游戏的使用方法，或者是有什么想说的，都可以发送邮件到：202311998019@mail.bnu.edu.cn  
-                  </p>
-                  <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
-                      希望这个游戏不要再有bug了！
-                  </p>
-              </div>
-              <div style="text-align: center; font-size: 16px; color: #000000; font-family: 'Comic Sans MS'; margin: 10px 20px 20px 20px;">
-                  单小西  2026年6月6日
-              </div>
+                function showAuthorMessage() {
+        // 判断当前是否为暗夜模式
+        const isDark = document.body.getAttribute('data-theme') === 'dark';
+        // 暗夜模式用米白色，其他模式用黑色
+        const textColor = isDark ? '#fdf5e6' : '#000000';
+
+        let msgHtml = `
+            <div style="font-size: 16px; color: ${textColor}; font-family: 'Comic Sans MS'; text-align: left; margin: 20px 20px 10px 20px; line-height: 1.8;">
+                <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                    我这个学期在北师大修读了一门课程《阅读障碍：从评估到干预》，事实上，这个小程序是我的一个课程大作业。
+                </p>
+                <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                    在这门课的实践环节，我和一位受到阅读障碍困扰的小朋友进行了五次干预，说是干预，其实是做些小游戏小手工、读读绘本。在每次干预开始前，我都会和我的搭档苦思冥想：今天可以带着小朋友做什么样的活动？
+                </p>
+                <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                    让我萌生这个“大富翁游戏”想法的也是在一次干预时，我们设计了一个飞行棋的活动，那位小朋友非常受用呀！已经到时间了仍然跟妈妈说还不愿意回家，说姐姐我们再玩一轮吧。
+                </p>
+                <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                    在此之后，我慢慢地开始理解老师在上课的时候和我们说的，我们需要设计出更多的干预类的游戏，把教学的形式变得不那么枯燥一些。
+                </p>
+                <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                    其实这个游戏，我设计的定位不只是面向受到Dyslexia困扰的孩子，我希望它能为正在学习汉字的孩子和他们背后“苦恼”的家长服务。
+                </p>
+                <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                    我希望孩子能发现：原来学习可以是这种形式；希望家长能发现：原来我可以通过这种方式教教我的小孩。
+                </p>
+                <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                    当然了！我知道我制作的这个小游戏肯定有很多不足之处，也会有其他人设计出更好的干预方式，但我也在想，我不能因为这些就不去做了！
+                </p>
+                <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                    我在“设置”的板块中加入了很多可以自由调节的环节，比如自由调节地块的数量，家长可以自行加入题目......在我的想象里，这个游戏在不同的家庭中可以被“玩”出不一样的效果，每个孩子的情况都不一样。
+                </p>
+                <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                    我建议家长们在游玩的过程中，找一张白纸，让孩子“写”字而不是简单地“读”字。也可以参考小学语文课本后的生词表来出题，可以让ai生成符合孩子当前学习状态的新题。因为我设置的题库数量很有限，肯定不能满足家长们的教学需求。
+                </p>
+                <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                    在最后，对有些许识字困难的孩子我想说：慢慢来，不要急。
+                </p>
+                <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                    对各位头疼的家长们我想说：感谢你们的耐心！常用汉字才3500个，即使孩子在低年级的时候学得慢一些、比别人学的少一些，但在反复的、长时间的练习下，总能把所有字都掌握的！有的时候，接纳孩子的不完美比接纳自己的不完美更困难。多给孩子一些鼓励，孩子能够感受到你们对ta的期待！
+                </p>
+                <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                    有需要的家长，可以关注我们老师的微信公众号：虹阅读实验室  
+                </p>
+                <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                    大家在体验游戏的过程中遇到什么困难，想要交流游戏的使用方法，或者是有什么想说的，都可以发送邮件到：202311998019@mail.bnu.edu.cn  
+                </p>
+                <p style="text-indent: 2em; margin: 0 0 0.5em 0;">
+                    希望这个游戏不要再有bug了！
+                </p>
+            </div>
+            <div style="text-align: center; font-size: 16px; color: ${textColor}; font-family: 'Comic Sans MS'; margin: 10px 20px 20px 20px;">
+                单小西  2026年6月6日
+            </div>
             `;
             showModal("✍️ 作者想说的话", msgHtml, [{ text: "退出", type: "wrong", action: hideModal }]);
         }
 
+        
         /** ==================== 游戏规则介绍 ==================== **/
         function showGameIntroduction() {
             let rulesHtml = `
